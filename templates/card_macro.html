@@ -1,6 +1,6 @@
-{% macro card_macro(card, edition_name, foil_quantity=0, nonfoil_quantity=0, foil_price='N/A', nonfoil_price='N/A') %}
+{% macro card_macro(card, set_name=None, foil_quantity=0, nonfoil_quantity=0, foil_price=None, nonfoil_price=None) %}
 <div class="card" data-collector-number="{{ card.collector_number }}" data-colors="{{ card.colors | join(' ') }}" data-rarity="{{ card.rarity }}" data-name="{{ card.name }}">
-    <img src="{{ url_for('card_image', edition_name=edition_name, scryfall_id=card.scryfall_id) }}" alt="Image of {{ card.name }}" class="card-image">
+    <img src="{{ url_for('card_image', edition_name=set_name, scryfall_id=card.scryfall_id) }}" alt="Image of {{ card.name }}" class="card-image">
     <div class="card-details">
         <div class="card-name-collector">
             <div class="card-name">{{ card.name }}</div>
@@ -19,11 +19,11 @@
         <div class="prices">
             <div class="price-detail">
                 <span class="price-label">Foil Price:</span>
-                <span class="price-amount">${{ foil_price }}</span>
+                <span class="price-amount">${{ foil_price if foil_price else 'N/A' }}</span>
             </div>
             <div class="price-detail">
                 <span class="price-label">Non-Foil Price:</span>
-                <span class="price-amount">${{ nonfoil_price }}</span>
+                <span class="price-amount">${{ nonfoil_price if nonfoil_price else 'N/A' }}</span>
             </div>
         </div>
     </div>

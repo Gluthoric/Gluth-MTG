@@ -19,14 +19,13 @@ class Edition(db.Model):
         return f'<Edition {self.name}>'
 
 class Card(db.Model):
+    __tablename__ = 'cards'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
-    edition_id = db.Column(db.Integer, db.ForeignKey('edition.id'), nullable=False)
-    edition = db.relationship('Edition', backref=db.backref('cards', lazy=True))
+    set_name = db.Column(db.String(255), nullable=False)
     collector_number = db.Column(db.String(50))
     scryfall_id = db.Column(db.String(50), unique=True, nullable=False)
     prices = db.Column(db.JSON)
-    quantity = db.Column(db.JSON)
     image_url = db.Column(db.String(255))
     oracle_text = db.Column(db.Text)
     type_line = db.Column(db.String(255))
@@ -37,6 +36,24 @@ class Card(db.Model):
     rarity = db.Column(db.String(50))
     colors = db.Column(db.JSON)
     color_identity = db.Column(db.JSON)
+    set_code = db.Column(db.String(36))
+    released_at = db.Column(db.Date)
 
     def __repr__(self):
         return f'<Card {self.name}>'
+
+class Collection(db.Model):
+    __tablename__ = 'collections'
+    id = db.Column(db.Integer, primary_key=True)
+    card_id = db.Column(db.Integer, db.ForeignKey('cards.id'), nullable=False)
+    card = db.relationship('Card', backref=db.backref('collections', lazy=True))
+    quantity_foil = db.Column(db.Integer, default=0)
+    quantity_nonfoil = db.Column(db.Integer, default=0)
+
+class Kiosk(db.Model):
+    __tablename__ = 'kiosk'
+    id = db.Column(db.Integer, primary_key=True)
+    card_id = db.Column(db.Integer, db.ForeignKey('cards.id'), nullable=False)
+    card = db.relationship('Card', backref=db.backref('kiosks', lazy=True))
+    quantity_foil = db.Column(db.Integer, default=0)
+    quantity_nonfoil = db.Column(db.Integer, default=0)

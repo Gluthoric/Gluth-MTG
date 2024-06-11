@@ -42,10 +42,10 @@
 
 <div id="cards-container" class="card-grid">
     {% for card in cards %}
-        {{ card_macro(card, edition_name=edition_name, foil_quantity=(card.quantity.owned_foil if 'owned_foil' in card.quantity else 0), 
-                      nonfoil_quantity=(card.quantity.owned_nonfoil if 'owned_nonfoil' in card.quantity else 0), 
-                      foil_price=(card.prices.usd_foil if 'usd_foil' in card.prices else 'N/A'), 
-                      nonfoil_price=(card.prices.usd if 'usd' in card.prices else 'N/A')) }}
+        {{ card_macro(card, set_name=edition_name, foil_quantity=(card.collections[0].quantity_foil if card.collections else 0), 
+                      nonfoil_quantity=(card.collections[0].quantity_nonfoil if card.collections else 0), 
+                      foil_price=(card.prices['usd_foil'] if 'usd_foil' in card.prices else 'N/A'), 
+                      nonfoil_price=(card.prices['usd'] if 'usd' in card.prices else 'N/A')) }}
     {% endfor %}
 </div>
 

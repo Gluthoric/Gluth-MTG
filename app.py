@@ -1,6 +1,6 @@
 import os
 from flask import Flask, render_template, request, jsonify, redirect, url_for
-from models import db, Card, Edition
+from models import db, Card, Edition, Collection, Kiosk
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -18,6 +18,12 @@ db.init_app(app)
 @app.route("/")
 def home():
     return redirect(url_for('editions'))
+
+@app.route("/static/card_images/<edition_name>/<scryfall_id>")
+def card_image(edition_name, scryfall_id):
+    # Logic to fetch and display card images
+    return f"/static/card_images/{edition_name}/{scryfall_id}"
+
 
 @app.route("/editions")
 def editions():
@@ -47,7 +53,7 @@ def edition_view(edition_name):
     color = request.args.get('color')
     rarity = request.args.get('rarity')
     
-    query = Card.query.filter_by(edition_id=edition_obj.id)
+    query = Card.query.filter_by(set_name=edition_name)
     
     if color:
         query = query.filter(Card.colors.contains([color]))
@@ -76,15 +82,14 @@ def filter_cards():
     if "searchTerm" in criteria and criteria["searchTerm"]:
         query = query.filter(Card.name.ilike(f"%{criteria['searchTerm']}%"))
     if "edition_name" in criteria and criteria["edition_name"]:
-        edition_obj = Edition.query.filter_by(name=criteria["edition_name"]).first_or_404()
-        query = query.filter_by(edition_id=edition_obj.id)
+        query = query.filter_by(set_name=criteria["edition_name"])
     
     filtered_cards = query.all()
     result = []
     for card in filtered_cards:
         result.append({
             'name': card.name,
-            'edition_name': card.edition.name,
+            'edition_name': card.set_name,
             'scryfall_id': card.scryfall_id,
             'prices': card.prices,
             'colors': card.colors,
