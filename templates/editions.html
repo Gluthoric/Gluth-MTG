@@ -1,0 +1,52 @@
+
+{% extends 'base.html' %}
+{% block title %}Card Editions{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='filters.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+<h1>Card Editions</h1>
+
+<div>
+    <form action="{{ url_for('editions') }}" method="get" class="filter-form">
+        <div class="form-group">
+            <label for="set_type">Set Type:</label>
+            <select name="set_type" id="set_type" class="form-control">
+                <option value="">All</option>
+
+                {% for set_type in ['token', 'duel_deck', 'promo', 'masters', 'expansion', 'memorabilia', 'box', 'commander', 'draft_innovation', 'masterpiece', 'minigame', 'core', 'starter', 'alchemy', 'from_the_vault', 'archenemy', 'treasure_chest', 'funny', 'premium_deck', 'vanguard', 'spellbook', 'arsenal', 'planechase'] %}
+                    <option value="{{ set_type }}" {% if request.args.get('set_type') == set_type %}selected{% endif %}>{{ set_type.title() }}</option>
+                {% endfor %}
+
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+</div>
+
+<div id="editions-container" class="grid-container">
+    {% for edition in editions.items %}
+        <div class="grid-item">
+            <div class="edition">
+                {% if edition.icon_svg_uri %}
+                    <img src="{{ edition.icon_svg_uri }}" alt="{{ edition.name }} icon" class="edition-icon">
+                {% endif %}
+                <h3><a href="{{ url_for('edition_view', edition_name=edition.name) }}">{{ edition.name }}</a></h3>
+                <p>Released: {{ edition.released_at }}</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<div class="pagination">
+    {% if editions.has_prev %}
+        <a href="{{ url_for('editions', page=editions.prev_num, set_type=request.args.get('set_type')) }}" class="btn btn-info">Previous</a>
+    {% endif %}
+    {% if editions.has_next %}
+        <a href="{{ url_for('editions', page=editions.next_num, set_type=request.args.get('set_type')) }}" class="btn btn-info">Next</a>
+    {% endif %}
+</div>
+{% endblock %}
