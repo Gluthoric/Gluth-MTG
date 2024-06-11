@@ -4,7 +4,7 @@ from models import db, Card, Set, Collection, Kiosk
 app = Flask(__name__)
 
 # SQLAlchemy configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://mtg_user:Caprisun1!@localhost/mtg_dashboard'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize the database
