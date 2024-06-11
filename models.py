@@ -2,7 +2,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-class Set(db.Model):
+class Edition(db.Model):
+    __tablename__ = 'edition'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     code = db.Column(db.String(10), nullable=False)
@@ -15,13 +16,13 @@ class Set(db.Model):
     icon_svg_uri = db.Column(db.String(255))
 
     def __repr__(self):
-        return f'<Set {self.name}>'
+        return f'<Edition {self.name}>'
 
 class Card(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
-    set_id = db.Column(db.Integer, db.ForeignKey('set.id'), nullable=False)
-    set = db.relationship('Set', backref=db.backref('cards', lazy=True))
+    edition_id = db.Column(db.Integer, db.ForeignKey('edition.id'), nullable=False)
+    edition = db.relationship('Edition', backref=db.backref('cards', lazy=True))
     collector_number = db.Column(db.String(50))
     scryfall_id = db.Column(db.String(50), unique=True, nullable=False)
     prices = db.Column(db.JSON)
@@ -39,21 +40,3 @@ class Card(db.Model):
 
     def __repr__(self):
         return f'<Card {self.name}>'
-
-class Collection(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    card_id = db.Column(db.Integer, db.ForeignKey('card.id'), nullable=False)
-    quantity_foil = db.Column(db.Integer, default=0)
-    quantity_nonfoil = db.Column(db.Integer, default=0)
-
-    def __repr__(self):
-        return f'<Collection Card ID {self.card_id} Foil {self.quantity_foil} Non-foil {self.quantity_nonfoil}>'
-
-class Kiosk(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    card_id = db.Column(db.Integer, db.ForeignKey('card.id'), nullable=False)
-    quantity_foil = db.Column(db.Integer, default=0)
-    quantity_nonfoil = db.Column(db.Integer, default=0)
-
-    def __repr__(self):
-        return f'<Kiosk Card ID {self.card_id} Foil {self.quantity_foil} Non-foil {self.quantity_nonfoil}>'

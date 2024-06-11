@@ -1,19 +1,20 @@
 {% extends 'base.html' %}
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='filters.js') }}" defer></script>
 {% endblock %}
 {% from 'card_macro.html' import card_macro %}
-{% block title %}{{ set_name }}{% endblock %}
+{% block title %}{{ edition_name }}{% endblock %}
 
 {% block content %}
-<h1>{{ set_name }}</h1>
+<h1>{{ edition_name }}</h1>
 
-{% if set_info.icon_svg_uri %}
-  <img src="{{ set_info.icon_svg_uri }}" alt="{{ set_name }} icon" style="width: 100px;">
+{% if edition_info.icon_svg_uri %}
+  <img src="{{ edition_info.icon_svg_uri }}" alt="{{ edition_name }} icon" style="width: 100px;">
 {% endif %}
 
 <div>
-    <form action="{{ url_for('set_view', set_name=set_name) }}" method="get" class="filter-form">
+    <form action="{{ url_for('edition_view', edition_name=edition_name) }}" method="get" class="filter-form">
         <div class="form-group">
             <label for="color">Color:</label>
             <select name="color" id="color" class="form-control">
@@ -41,7 +42,7 @@
 
 <div id="cards-container" class="card-grid">
     {% for card in cards %}
-        {{ card_macro(card, set_name=set_name, foil_quantity=(card.quantity.owned_foil if 'owned_foil' in card.quantity else 0), 
+        {{ card_macro(card, edition_name=edition_name, foil_quantity=(card.quantity.owned_foil if 'owned_foil' in card.quantity else 0), 
                       nonfoil_quantity=(card.quantity.owned_nonfoil if 'owned_nonfoil' in card.quantity else 0), 
                       foil_price=(card.prices.usd_foil if 'usd_foil' in card.prices else 'N/A'), 
                       nonfoil_price=(card.prices.usd if 'usd' in card.prices else 'N/A')) }}
@@ -50,10 +51,10 @@
 
 <div class="pagination">
     {% if page > 1 %}
-        <a href="{{ url_for('set_view', set_name=set_name, page=page-1, color=request.args.get('color'), rarity=request.args.get('rarity')) }}" class="btn btn-info">Previous</a>
+        <a href="{{ url_for('edition_view', edition_name=edition_name, page=page-1, color=request.args.get('color'), rarity=request.args.get('rarity')) }}" class="btn btn-info">Previous</a>
     {% endif %}
     {% if page < total_pages %}
-        <a href="{{ url_for('set_view', set_name=set_name, page=page+1, color=request.args.get('color'), rarity=request.args.get('rarity')) }}" class="btn btn-info">Next</a>
+        <a href="{{ url_for('edition_view', edition_name=edition_name, page=page+1, color=request.args.get('color'), rarity=request.args.get('rarity')) }}" class="btn btn-info">Next</a>
     {% endif %}
 </div>
 {% endblock %}
