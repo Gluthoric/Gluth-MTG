@@ -48,13 +48,4 @@
                       nonfoil_price=(card.prices['usd'] if 'usd' in card.prices else 'N/A')) }}
     {% endfor %}
 </div>
-
-<div class="pagination">
-    {% if page > 1 %}
-        <a href="{{ url_for('edition_view', edition_name=edition_name, page=page-1, color=request.args.get('color'), rarity=request.args.get('rarity')) }}" class="btn btn-info">Previous</a>
-    {% endif %}
-    {% if page < total_pages %}
-        <a href="{{ url_for('edition_view', edition_name=edition_name, page=page+1, color=request.args.get('color'), rarity=request.args.get('rarity')) }}" class="btn btn-info">Next</a>
-    {% endif %}
-</div>
 {% endblock %}

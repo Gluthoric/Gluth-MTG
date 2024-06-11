@@ -1,4 +1,4 @@
-import os
+import os, re
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from models import db, Card, Edition, Collection, Kiosk
 from dotenv import load_dotenv
@@ -43,32 +43,38 @@ def editions():
 
     return render_template('editions.html', editions=pagination, page=page, total_pages=total_pages)
 
+def collector_number_sort_key(card):
+    match = re.match(r'(\d+)(\D*)', card.collector_number)
+    if match:
+        return (int(match.group(1)), match.group(2))
+    else:
+        return (0, '')
+
 @app.route("/editions/<edition_name>")
 def edition_view(edition_name):
-    page = request.args.get('page', 1, type=int)
-    per_page = 20  # Number of cards per page
-
     edition_obj = Edition.query.filter_by(name=edition_name).first_or_404()
-    
     color = request.args.get('color')
     rarity = request.args.get('rarity')
-    
+    order = request.args.get('order', 'asc')  # Default order is ascending
+
     query = Card.query.filter_by(set_name=edition_name)
-    
+
     if color:
         query = query.filter(Card.colors.contains([color]))
     if rarity:
         query = query.filter_by(rarity=rarity)
-        
-    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
-    cards_in_edition = pagination.items
-    total_pages = pagination.pages
-    
-    edition_info = {
-        "icon_svg_uri": edition_obj.icon_svg_uri
-    }
 
-    return render_template('edition_view.html', edition_name=edition_name, edition_info=edition_info, cards=cards_in_edition, page=page, total_pages=total_pages)
+    cards_in_edition = query.all()  # Fetch all cards without pagination
+
+    if order == 'desc':
+        cards_in_edition.sort(key=collector_number_sort_key, reverse=True)
+    else:
+        cards_in_edition.sort(key=collector_number_sort_key)
+
+    edition_info = {
+        'icon_svg_uri': edition_obj.icon_svg_uri
+    }
+    return render_template('edition_view.html', edition_name=edition_name, edition_info=edition_info, cards=cards_in_edition, order=order)
 
 @app.route("/filter_cards", methods=["POST"])
 def filter_cards():

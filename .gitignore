@@ -3,4 +3,4 @@
 schema.sql
 default_cards.json
 default_cards.csv
-import_scryfall_default_cards.py
+import_scryfall_default_cards.py__pycache__/
