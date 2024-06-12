@@ -1,5 +1,6 @@
-import os, re
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+import os
+import re
+from flask import Flask, render_template, request, jsonify, redirect, url_for, send_from_directory
 from models import db, Card, Edition, Collection, Kiosk
 from dotenv import load_dotenv
 
@@ -24,25 +25,39 @@ def card_image(edition_name, scryfall_id):
     # Logic to fetch and display card images
     return f"/static/card_images/{edition_name}/{scryfall_id}"
 
-
 @app.route("/editions")
 def editions():
     page = request.args.get('page', 1, type=int)
     per_page = 20  # Number of editions per page
 
     set_type = request.args.get('set_type')
+    release_date = request.args.get('release_date', 'desc')
     
     query = Edition.query
     
     if set_type:
         query = query.filter_by(set_type=set_type)
     
+    if release_date.lower() == 'asc':
+        query = query.order_by(Edition.released_at.asc())
+    else:
+        query = query.order_by(Edition.released_at.desc())
+    
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
     editions = pagination.items
     total_pages = pagination.pages
 
-    return render_template('editions.html', editions=pagination, page=page, total_pages=total_pages)
+    # Calculate total collection stats
+    total_cards_collected = sum(edition.collected_cards for edition in editions)
+    total_cards = sum(edition.card_count for edition in editions)
+    total_value = sum(edition.total_value for edition in editions)
+    percentage_collected = (total_cards_collected / total_cards) * 100 if total_cards else 0
 
+    return render_template('editions.html', editions=editions, page=page, total_pages=total_pages,
+                           total_cards_collected=total_cards_collected, total_cards=total_cards,
+                           total_value=total_value, percentage_collected=percentage_collected)
+    
+    
 def collector_number_sort_key(card):
     match = re.match(r'(\d+)(\D*)', card.collector_number)
     if match:
@@ -102,7 +117,17 @@ def filter_cards():
             'rarity': card.rarity
         })
 
+    if 'release_date' in criteria and criteria['release_date'].lower() == 'asc':
+        query = query.join(Edition, Edition.id == Card.edition_id).order_by(Edition.released_at.asc())
+    else:
+        query = query.join(Edition, Edition.id == Card.edition_id).order_by(Edition.released_at.desc())
     return jsonify(result)
+
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico')
+
 
 if __name__ == "__main__":
     app.run(debug=True)

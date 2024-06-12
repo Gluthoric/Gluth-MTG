@@ -1,6 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.ext.hybrid import hybrid_property
 
 db = SQLAlchemy()
+
 
 class Edition(db.Model):
     __tablename__ = 'edition'
@@ -15,8 +17,19 @@ class Edition(db.Model):
     foil_only = db.Column(db.Boolean)
     icon_svg_uri = db.Column(db.String(255))
 
+    cards = db.relationship('Card', backref='edition', lazy=True)
+
+    @hybrid_property
+    def collected_cards(self):
+        return sum(collection.quantity_foil + collection.quantity_nonfoil for card in self.cards for collection in card.collections)
+
+    @hybrid_property
+    def total_value(self):
+        return sum((card.prices['usd_foil'] if 'usd_foil' in card.prices else 0) + (card.prices['usd'] if 'usd' in card.prices else 0) for card in self.cards)
+
     def __repr__(self):
         return f'<Edition {self.name}>'
+
 
 class Card(db.Model):
     __tablename__ = 'cards'
@@ -38,9 +51,11 @@ class Card(db.Model):
     color_identity = db.Column(db.JSON)
     set_code = db.Column(db.String(36))
     released_at = db.Column(db.Date)
+    edition_id = db.Column(db.String(36), db.ForeignKey('edition.id'), nullable=False)
 
     def __repr__(self):
         return f'<Card {self.name}>'
+
 
 class Collection(db.Model):
     __tablename__ = 'collections'
@@ -49,6 +64,7 @@ class Collection(db.Model):
     card = db.relationship('Card', backref=db.backref('collections', lazy=True))
     quantity_foil = db.Column(db.Integer, default=0)
     quantity_nonfoil = db.Column(db.Integer, default=0)
+
 
 class Kiosk(db.Model):
     __tablename__ = 'kiosk'

@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
+                release_date: sortSelect.value,
                 colors: selectedColors,
                 rarities: selectedRarities,
                 searchTerm: searchTerm,
