@@ -1,9 +1,3 @@
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.ext.hybrid import hybrid_property
-
-db = SQLAlchemy()
-
-
 class Edition(db.Model):
     __tablename__ = 'edition'
     id = db.Column(db.Integer, primary_key=True)
