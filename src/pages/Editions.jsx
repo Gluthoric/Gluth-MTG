@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { ListGroup, Container } from 'react-bootstrap';
+import { useCardContext } from '../context/CardContext';
 
 const Editions = () => {
+  const { state, dispatch } = useCardContext();
+  const { cards } = state;
   const [editions, setEditions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,17 +37,17 @@ const Editions = () => {
   }
 
   return (
-    <div>
+    <Container>
       <h2>Editions Page</h2>
       <p>Here you can see all the editions.</p>
-      <ul>
+      <ListGroup>
         {editions.map((edition) => (
-          <li key={edition.id}>
+          <ListGroup.Item key={edition.id}>
             <Link to={`/editions/${edition.id}`}>{edition.name}</Link>
-          </li>
+          </ListGroup.Item>
         ))}
-      </ul>
-    </div>
+      </ListGroup>
+    </Container>
   );
 };
 

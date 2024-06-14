@@ -1,83 +1,78 @@
 ```markdown
 # react-gluth-mtg
 
-react-gluth-mtg is a web application designed to help users track their Magic: The Gathering (MTG) card collection. The app allows users to filter, sort, and manage their card collection, providing a visual distinction between owned and unowned cards. It also features a Kiosk page to display cards with quantities greater than one.
+react-gluth-mtg is a web application designed to help users track their Magic: The Gathering (MTG) card collection. The app provides an interactive interface for managing card quantities, viewing different editions, and displaying cards with quantities greater than one.
 
 ## Overview
 
-react-gluth-mtg is built using the following technologies:
+The application interfaces with a MySQL database to store and manage information about MTG card editions and individual cards. The frontend is built using React, with Bootstrap for styling, and the backend is built using Node.js with Express to handle API requests. State management in the frontend is handled using React Context or Redux, and Axios or Fetch API is used for making requests to the backend.
 
-- **Frontend**: React, React Bootstrap, React Router DOM
-- **Backend**: Node.js with Express
-- **Database**: MySQL
-- **Styling**: Bootstrap
-- **State Management**: React Context or Redux
-- **HTTP Client**: Axios
+### Architecture and Technologies
+
+- **Frontend:** React, React Bootstrap, React Router DOM, Axios
+- **Backend:** Node.js, Express, Sequelize ORM
+- **Database:** MySQL
+- **Styling:** Bootstrap
+- **State Management:** React Context or Redux
 
 ### Project Structure
 
 The project is structured as follows:
 
-- **Frontend**:
-  - `src/App.jsx`: Root component that includes the navigation bar and main content area.
-  - `src/main.jsx`: Main entry point for the React application, setting up routing and rendering the root component.
-  - `src/pages`: Contains the different page components (Home, Editions, Edition, Kiosk).
-  - `src/components/Navbar.jsx`: Defines the navigation bar component.
-  - `public/index.html`: Main HTML file.
-- **Backend**:
-  - `server/config/database.js`: Configures and initializes the MySQL database connection using Sequelize.
-  - `server/index.js`: Sets up the Express server.
-  - `server/routes`: Defines the API routes for fetching and updating data.
-  - `server/models`: Defines the Sequelize models for the database schema.
-- **Configuration**:
-  - `.env`: Environment variables for database connection.
-  - `package.json`: Project dependencies and scripts.
-  - `.eslintrc.cjs`: ESLint configuration.
-  - `vite.config.js`: Vite configuration for bundling.
+- **Frontend:**
+  - `src/App.jsx`: Root component of the application.
+  - `src/components/Navbar.jsx`: Navigation bar component.
+  - `src/components/SortingFilteringControls.jsx`: Component for sorting and filtering controls.
+  - `src/pages/`: Directory containing page components (Home, Editions, Edition, Cards, Kiosk).
+  - `src/context/CardContext.js`: Context for managing card state.
+  - `src/services/cardService.js`: Service for interacting with the backend API.
+  - `src/index.css`: Global styles.
+  - `src/App.css`: Component-specific styles.
+
+- **Backend:**
+  - `server/index.js`: Main entry point for the backend server.
+  - `server/config/database.js`: Database configuration and initialization.
+  - `server/models/`: Directory containing Sequelize models (Edition, Card, Collection, Kiosk).
+  - `server/routes/`: Directory containing route handlers for API endpoints (cards, editions).
 
 ## Features
 
-- **Navigation Bar**: Located on the left, allows users to navigate to different sections such as Editions and Kiosk.
-- **Editions Page**: Displays all editions, and clicking on an edition shows all cards within that edition.
-- **Cards Page**: Displays cards within a selected edition, allows changing the quantity of each card owned, and visually distinguishes owned vs. unowned cards.
-- **Kiosk Page**: Displays cards with quantities greater than one.
-- **Sorting and Filtering**: Users can sort and filter cards based on different traits.
+- **Navigation Bar:** Located on the left side, allows navigation to different sections like Editions and Kiosk.
+- **Editions Page:** Displays all editions. Clicking on an edition shows all cards within that edition.
+- **Cards Page:** Displays cards within a selected edition. Users can change the quantity of each card they own. Cards are visually distinguished based on ownership. Users can sort and filter cards.
+- **Kiosk Page:** Displays cards with quantities greater than 1, similar to the Cards page.
 
 ## Getting started
 
 ### Requirements
 
-To run this project, you will need:
+To run the project, you need the following technologies installed on your computer:
 
 - Node.js
 - MySQL
-- npm (Node Package Manager)
 
 ### Quickstart
 
-1. **Clone the repository**:
-   ```bash
-   git clone <repository-url>
+1. **Clone the repository:**
+   ```sh
+   git clone https://github.com/yourusername/react-gluth-mtg.git
    cd react-gluth-mtg
    ```
 
-2. **Set up the environment variables**:
+2. **Set up environment variables:**
    Create a `.env` file in the project root and add the following:
-   ```env
+   ```
    DATABASE_URL='mysql+pymysql://mtg_user:Caprisun1!@localhost/mtg_dashboard'
    ```
 
-3. **Install the dependencies**:
-   ```bash
+3. **Install dependencies:**
+   ```sh
    npm install
    ```
 
-4. **Set up the database**:
-   Ensure your MySQL server is running and create the necessary database and tables:
+4. **Set up the database:**
+   Ensure MySQL is running and execute the following SQL commands to create the required schema:
    ```sql
-   CREATE DATABASE mtg_dashboard;
-   USE mtg_dashboard;
-
    CREATE TABLE editions (
      id INT PRIMARY KEY,
      name VARCHAR(255) NOT NULL
@@ -92,22 +87,20 @@ To run this project, you will need:
    );
    ```
 
-5. **Run the backend server**:
-   ```bash
-   node server/index.js
+5. **Run the backend server:**
+   ```sh
+   npm run server
    ```
 
-6. **Run the frontend**:
-   ```bash
-   npm run dev
+6. **Run the frontend development server:**
+   ```sh
+   npm start
    ```
 
-7. **Open the application**:
+7. **Access the application:**
    Open your browser and navigate to `http://localhost:3000`.
 
 ### License
 
-The project is proprietary (not open source). All rights reserved.
-
-© 2024.
+The project is proprietary (not open source). All rights reserved. Copyright (c) 2024.
 ```

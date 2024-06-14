@@ -1,8 +1,19 @@
-
 import React from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
+import { useCardContext } from '../context/CardContext';
 
-const SortingFilteringControls = ({ sortOption, filterOption, onSortChange, onFilterChange }) => {
+const SortingFilteringControls = () => {
+  const { state, dispatch } = useCardContext();
+  const { sortOption, filterOption } = state;
+
+  const handleSortChange = (e) => {
+    dispatch({ type: 'SET_SORT_OPTION', payload: e.target.value });
+  };
+
+  const handleFilterChange = (e) => {
+    dispatch({ type: 'SET_FILTER_OPTION', payload: e.target.value });
+  };
+
   return (
     <div className="sorting-filtering-controls">
       <Row>
@@ -12,7 +23,7 @@ const SortingFilteringControls = ({ sortOption, filterOption, onSortChange, onFi
             <Form.Control
               as="select"
               value={sortOption}
-              onChange={(e) => onSortChange(e.target.value)}
+              onChange={handleSortChange}
             >
               <option value="">Select...</option>
               <option value="name">Name</option>
@@ -26,7 +37,7 @@ const SortingFilteringControls = ({ sortOption, filterOption, onSortChange, onFi
             <Form.Control
               as="select"
               value={filterOption}
-              onChange={(e) => onFilterChange(e.target.value)}
+              onChange={handleFilterChange}
             >
               <option value="">Select...</option>
               <option value="owned">Owned</option>

@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Form, Button, Card as BootstrapCard } from 'react-bootstrap';
+import { Form, Card as BootstrapCard, Container, Row, Col } from 'react-bootstrap';
 import { fetchCardsByEdition, updateCardQuantity } from '../services/cardService';
 import SortingFilteringControls from '../components/SortingFilteringControls';
+import { useCardContext } from '../context/CardContext';
 
 const Cards = () => {
   const { id } = useParams();
-  const [cards, setCards] = useState([]);
+  const { state, dispatch } = useCardContext();
+  const { cards, sortOption, filterOption } = state;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [sortOption, setSortOption] = useState('');
-  const [filterOption, setFilterOption] = useState('');
 
   useEffect(() => {
     const fetchCards = async () => {
       try {
         const cardsData = await fetchCardsByEdition(id);
-        setCards(cardsData);
+        dispatch({ type: 'SET_CARDS', payload: cardsData });
         setLoading(false);
         console.log('Fetched cards successfully:', cardsData);
       } catch (err) {
@@ -27,12 +27,12 @@ const Cards = () => {
     };
 
     fetchCards();
-  }, [id]);
+  }, [id, dispatch]);
 
   const handleUpdateQuantity = async (cardId, newQuantity) => {
     try {
       const updatedCard = await updateCardQuantity(cardId, newQuantity);
-      setCards(cards.map(card => (card.id === cardId ? updatedCard : card)));
+      dispatch({ type: 'UPDATE_CARD_QUANTITY', payload: { id: cardId, quantity: newQuantity } });
       console.log(`Updated quantity for card ${cardId} to ${newQuantity}`);
     } catch (err) {
       console.error('Error updating quantity:', err.message, err.stack);
@@ -40,7 +40,7 @@ const Cards = () => {
   };
 
   const handleSortChange = (option) => {
-    setSortOption(option);
+    dispatch({ type: 'SET_SORT_OPTION', payload: option });
     // Implement sorting logic based on the selected option
     const sortedCards = [...cards].sort((a, b) => {
       if (option === 'name') {
@@ -50,11 +50,11 @@ const Cards = () => {
       }
       return 0;
     });
-    setCards(sortedCards);
+    dispatch({ type: 'SET_CARDS', payload: sortedCards });
   };
 
   const handleFilterChange = (option) => {
-    setFilterOption(option);
+    dispatch({ type: 'SET_FILTER_OPTION', payload: option });
     // Implement filtering logic based on the selected option
     const filteredCards = cards.filter(card => {
       if (option === 'owned') {
@@ -64,7 +64,7 @@ const Cards = () => {
       }
       return true;
     });
-    setCards(filteredCards);
+    dispatch({ type: 'SET_CARDS', payload: filteredCards });
   };
 
   if (loading) {
@@ -76,7 +76,7 @@ const Cards = () => {
   }
 
   return (
-    <div>
+    <Container>
       <h2>Edition {id} Cards</h2>
       <SortingFilteringControls
         sortOption={sortOption}
@@ -84,30 +84,29 @@ const Cards = () => {
         onSortChange={handleSortChange}
         onFilterChange={handleFilterChange}
       />
-      <div className="card-grid">
+      <Row className="card-grid">
         {cards.map(card => (
-          <BootstrapCard
-            key={card.id}
-            className={`card-item ${card.quantity > 0 ? 'owned' : 'unowned'}`}
-          >
-            <BootstrapCard.Body>
-              <BootstrapCard.Title>{card.name}</BootstrapCard.Title>
-              <Form>
-                <Form.Group controlId={`card-quantity-${card.id}`}>
-                  <Form.Label>Quantity</Form.Label>
-                  <Form.Control
-                    type="number"
-                    value={card.quantity}
-                    onChange={e => handleUpdateQuantity(card.id, parseInt(e.target.value))}
-                    min="0"
-                  />
-                </Form.Group>
-              </Form>
-            </BootstrapCard.Body>
-          </BootstrapCard>
+          <Col key={card.id} xs={12} sm={6} md={4} className={`card-item ${card.quantity > 0 ? 'owned' : 'unowned'}`}>
+            <BootstrapCard>
+              <BootstrapCard.Body>
+                <BootstrapCard.Title>{card.name}</BootstrapCard.Title>
+                <Form>
+                  <Form.Group controlId={`card-quantity-${card.id}`}>
+                    <Form.Label>Quantity</Form.Label>
+                    <Form.Control
+                      type="number"
+                      value={card.quantity}
+                      onChange={e => handleUpdateQuantity(card.id, parseInt(e.target.value))}
+                      min="0"
+                    />
+                  </Form.Group>
+                </Form>
+              </BootstrapCard.Body>
+            </BootstrapCard>
+          </Col>
         ))}
-      </div>
-    </div>
+      </Row>
+    </Container>
   );
 };
 
