@@ -1,4 +1,3 @@
-
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/database.js';
 
@@ -27,5 +26,7 @@ const Collection = sequelize.define('Collection', {
   tableName: 'collections',
   timestamps: false,
 });
+
+
 
 export default Collection;

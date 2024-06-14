@@ -7,7 +7,11 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const editions = await Edition.findAll();
-    console.log('Fetched all editions successfully');
+    if (editions.length > 0) {
+      console.log('Fetched all editions successfully:', editions); // Log fetched editions
+    } else {
+      console.log('No editions found');
+    }
     res.status(200).json(editions);
   } catch (error) {
     console.error('Error fetching editions:', error.message, error.stack);

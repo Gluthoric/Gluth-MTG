@@ -1,4 +1,3 @@
-
 import express from 'express';
 import Sequelize from 'sequelize'; // Import Sequelize for operators
 import Card from '../models/card.js';
@@ -11,7 +10,11 @@ router.get('/editions/:id/cards', async (req, res) => {
   const { id } = req.params;
   try {
     const cards = await Card.findAll({ where: { edition_id: id } });
-    console.log(`Fetched cards for edition ${id} successfully`);
+    if (cards.length > 0) {
+      console.log(`Fetched cards for edition ${id} successfully:`, cards); // Log fetched cards
+    } else {
+      console.log(`No cards found for edition ${id}`);
+    }
     res.status(200).json(cards);
   } catch (error) {
     console.error(`Error fetching cards for edition ${id}:`, error.message, error.stack);
@@ -53,7 +56,7 @@ router.get('/kiosk', async (req, res) => {
         }
       }
     });
-    console.log('Fetched cards for kiosk successfully');
+    console.log('Fetched cards for kiosk successfully:', cards); // Log fetched cards
     res.status(200).json(cards);
   } catch (error) {
     console.error('Error fetching cards for kiosk:', error.message, error.stack);

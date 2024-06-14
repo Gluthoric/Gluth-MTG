@@ -1,4 +1,3 @@
-
 import express from 'express';
 import cors from 'cors';
 import editionsRoutes from './routes/editions.js';
@@ -38,8 +37,9 @@ app.use((err, req, res, next) => {
 // Dynamically import Sequelize configuration and start server
 (async () => {
   try {
-    const { default: sequelize } = await import('./config/database.js');
+    const { sequelize } = await import('./models/index.js');
     await sequelize.authenticate();
+
     console.log('Database connected successfully');
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
