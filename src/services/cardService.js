@@ -9,11 +9,11 @@ export const fetchCardsByEdition = async (editionId) => {
     console.log(`Fetched cards for edition ${editionId} successfully`);
 
     const cardsWithDetails = response.data.map(card => {
-      const prices = card.prices;
+      const prices = JSON.parse(card.prices);
       const usdPrice = prices.usd;
       const usdFoilPrice = prices.usd_foil;
 
-      const quantity = card.quantity;
+      const quantity = JSON.parse(card.quantity);
       const foilQuantity = quantity.foil;
       const nonfoilQuantity = quantity.nonfoil;
 
@@ -50,11 +50,11 @@ export const fetchKioskCards = async () => {
     console.log('Fetched cards for kiosk successfully');
 
     const cardsWithDetails = response.data.map(card => {
-      const prices = card.prices;
+      const prices = JSON.parse(card.prices);
       const usdPrice = prices.usd;
       const usdFoilPrice = prices.usd_foil;
 
-      const quantity = card.quantity;
+      const quantity = JSON.parse(card.quantity);
       const foilQuantity = quantity.foil;
       const nonfoilQuantity = quantity.nonfoil;
 

@@ -5,11 +5,11 @@ const API_BASE_URL = 'http://localhost:3000'; // API base URL
 export const extractPrices = (cards) => {
   return cards.map(card => {
     try {
-      const prices = JSON.parse(card.prices);
+      const prices = card.prices ? JSON.parse(card.prices) : {};
       const usdPrice = prices.usd;
       const usdFoilPrice = prices.usd_foil;
 
-      const quantity = card.quantity;
+      const quantity = card.quantity ? JSON.parse(card.quantity) : {};
       const foilQuantity = quantity.foil;
       const nonfoilQuantity = quantity.nonfoil;
 
@@ -21,7 +21,7 @@ export const extractPrices = (cards) => {
         nonfoilQuantity
       };
     } catch (error) {
-      console.error('Error parsing prices JSON:', error);
+      console.error('Error parsing prices or quantities JSON:', error);
       return {
         ...card,
         usd: null,

@@ -14,7 +14,10 @@ router.get('/editions/:id/cards', async (req, res) => {
     const cards = await Card.findAll({
       where: { edition_id: id },
       attributes: [
-        'id', 'name', 'prices', 'quantity', 'image_url', 'oracle_text', 'type_line',
+        'id', 'name', 
+        [Sequelize.fn('JSON_UNQUOTE', Sequelize.json('prices')), 'prices'], 
+        [Sequelize.fn('JSON_UNQUOTE', Sequelize.json('quantity')), 'quantity'], 
+        'image_url', 'oracle_text', 'type_line',
         'mana_cost', 'cmc', 'power', 'toughness', 'rarity', 'colors',
         'color_identity', 'set_code', 'released_at'
       ]
@@ -43,10 +46,11 @@ router.patch('/cards/:id', validateQuantity, async (req, res) => {
       return res.status(404).json({ error: 'Card not found' });
     }
 
+    // Update the quantity
     card.quantity = quantity;
     await card.save();
 
-    console.log(`Updated quantity for card ${id} to ${quantity}`);
+    console.log(`Updated quantity for card ${id} to ${JSON.stringify(quantity)}`);
     res.status(200).json(card);
   } catch (error) {
     console.error(`Error updating quantity for card ${id}:`, error.message, error.stack);
@@ -65,7 +69,10 @@ router.get('/kiosk', async (req, res) => {
         ]
       },
       attributes: [
-        'id', 'name', 'prices', 'quantity', 'image_url', 'oracle_text', 'type_line',
+        'id', 'name', 
+        [Sequelize.fn('JSON_UNQUOTE', Sequelize.json('prices')), 'prices'], 
+        [Sequelize.fn('JSON_UNQUOTE', Sequelize.json('quantity')), 'quantity'], 
+        'image_url', 'oracle_text', 'type_line',
         'mana_cost', 'cmc', 'power', 'toughness', 'rarity', 'colors',
         'color_identity', 'set_code', 'released_at'
       ]

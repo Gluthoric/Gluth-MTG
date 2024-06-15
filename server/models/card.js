@@ -1,4 +1,5 @@
 import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const Card = sequelize.define('Card', {
   id: {
@@ -86,7 +87,27 @@ const Card = sequelize.define('Card', {
       key: 'id',
     },
   },
+  quantity_foil: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: 0,
+  },
+  quantity_nonfoil: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: 0,
+  },
+  price_foil: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
+  },
+  price_nonfoil: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
+  },
 }, {
   tableName: 'cards',
   timestamps: false,
-}); 
+});
+
+export default Card;

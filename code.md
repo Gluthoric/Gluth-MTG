@@ -55,58 +55,28 @@ app.use((err, req, res, next) => {
 
 ## server/middleware/validateQuantity.js
 {{
-import express from 'express';
-import Card from '../models/card.js';
+// server/middleware/validateQuantity.js
 
-const router = express.Router();
-
-// Middleware to validate the quantity field in the request body
 const validateQuantity = (req, res, next) => {
   const { quantity } = req.body;
-  if (typeof quantity !== 'number' || quantity < 0) {
+
+  // Check if quantity is an object
+  if (typeof quantity !== 'object' || quantity === null) {
     console.error('Invalid quantity:', quantity);
-    return res.status(400).json({ error: 'Invalid quantity. Quantity must be a non-negative number.' });
+    return res.status(400).json({ error: 'Invalid quantity. Quantity must be an object with non-negative numbers for foil and nonfoil.' });
   }
+
+  // Check if both foil and nonfoil are non-negative numbers
+  const { foil, nonfoil } = quantity;
+  if (typeof foil !== 'number' || foil < 0 || typeof nonfoil !== 'number' || nonfoil < 0) {
+    console.error('Invalid quantity:', quantity);
+    return res.status(400).json({ error: 'Invalid quantity. Both foil and nonfoil must be non-negative numbers.' });
+  }
+
   next();
 };
 
-// GET /editions/:id/cards - Fetch all cards within a specific edition
-router.get('/editions/:id/cards', async (req, res) => {
-  const { id } = req.params;
-  try {
-    const cards = await Card.findAll({ where: { edition_id: id } });
-    console.log(`Fetched cards for edition ${id} successfully`);
-    res.status(200).json(cards);
-  } catch (error) {
-    console.error(`Error fetching cards for edition ${id}:`, error.message, error.stack);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-// PATCH /cards/:id - Update the quantity of a specific card
-router.patch('/cards/:id', validateQuantity, async (req, res) => {
-  const { id } = req.params;
-  const { quantity } = req.body;
-
-  try {
-    const card = await Card.findByPk(id);
-    if (!card) {
-      console.error(`Card with id ${id} not found`);
-      return res.status(404).json({ error: 'Card not found' });
-    }
-
-    card.quantity = quantity;
-    await card.save();
-
-    console.log(`Updated quantity for card ${id} to ${quantity}`);
-    res.status(200).json(card);
-  } catch (error) {
-    console.error(`Error updating quantity for card ${id}:`, error.message, error.stack);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-export default router;
+export default validateQuantity;
 
 }}
 
@@ -321,6 +291,7 @@ const Card = sequelize.define('Card', {
 });
 
 export default Card;
+
 }}
 
 ## server/models/edition.js
@@ -397,9 +368,12 @@ router.get('/editions/:id/cards', async (req, res) => {
     const cards = await Card.findAll({
       where: { edition_id: id },
       attributes: [
-        'id', 'name', 'quantity', 'image_url', 'oracle_text', 'type_line',
+        'id', 'name', 
+        [Sequelize.fn('JSON_UNQUOTE', Sequelize.json('prices')), 'prices'], 
+        [Sequelize.fn('JSON_UNQUOTE', Sequelize.json('quantity')), 'quantity'], 
+        'image_url', 'oracle_text', 'type_line',
         'mana_cost', 'cmc', 'power', 'toughness', 'rarity', 'colors',
-        'color_identity', 'set_code', 'released_at', 'quantity_foil', 'quantity_nonfoil', 'price_foil', 'price_nonfoil', 'prices'
+        'color_identity', 'set_code', 'released_at'
       ]
     });
     if (cards.length > 0) {
@@ -426,10 +400,11 @@ router.patch('/cards/:id', validateQuantity, async (req, res) => {
       return res.status(404).json({ error: 'Card not found' });
     }
 
+    // Update the quantity
     card.quantity = quantity;
     await card.save();
 
-    console.log(`Updated quantity for card ${id} to ${quantity}`);
+    console.log(`Updated quantity for card ${id} to ${JSON.stringify(quantity)}`);
     res.status(200).json(card);
   } catch (error) {
     console.error(`Error updating quantity for card ${id}:`, error.message, error.stack);
@@ -448,9 +423,12 @@ router.get('/kiosk', async (req, res) => {
         ]
       },
       attributes: [
-        'id', 'name', 'quantity', 'image_url', 'oracle_text', 'type_line',
+        'id', 'name', 
+        [Sequelize.fn('JSON_UNQUOTE', Sequelize.json('prices')), 'prices'], 
+        [Sequelize.fn('JSON_UNQUOTE', Sequelize.json('quantity')), 'quantity'], 
+        'image_url', 'oracle_text', 'type_line',
         'mana_cost', 'cmc', 'power', 'toughness', 'rarity', 'colors',
-        'color_identity', 'set_code', 'released_at', 'quantity_foil', 'quantity_nonfoil', 'price_foil', 'price_nonfoil', 'prices'
+        'color_identity', 'set_code', 'released_at'
       ]
     });
     if (cards.length > 0) {
@@ -832,7 +810,12 @@ const Cards = () => {
 
   const handleUpdateQuantity = async (cardId, type, newQuantity) => {
     try {
-      const updatedCard = await updateCardQuantity(cardId, newQuantity);
+      const card = cards.find(card => card.id === cardId);
+      const updatedQuantity = {
+        ...JSON.parse(card.quantity),
+        [type]: newQuantity
+      };
+      const updatedCard = await updateCardQuantity(cardId, JSON.stringify(updatedQuantity));
       dispatch({ type: 'UPDATE_CARD_QUANTITY', payload: { id: cardId, [type === 'foil' ? 'quantity_foil' : 'quantity_nonfoil']: newQuantity } });
       console.log(`Updated ${type} quantity for card ${cardId} to ${newQuantity}`);
     } catch (err) {
@@ -842,7 +825,6 @@ const Cards = () => {
 
   const handleSortChange = (option) => {
     dispatch({ type: 'SET_SORT_OPTION', payload: option });
-    // Implement sorting logic based on the selected option
     const sortedCards = [...cards].sort((a, b) => {
       if (option === 'name') {
         return a.name.localeCompare(b.name);
@@ -856,7 +838,6 @@ const Cards = () => {
 
   const handleFilterChange = (option) => {
     dispatch({ type: 'SET_FILTER_OPTION', payload: option });
-    // Implement filtering logic based on the selected option
     const filteredCards = cards.filter(card => {
       if (option === 'owned') {
         return (card.quantity_foil + card.quantity_nonfoil) > 0;
@@ -897,6 +878,7 @@ const Cards = () => {
 };
 
 export default Cards;
+
 }}
 
 ## src/pages/Home.jsx
@@ -1170,18 +1152,29 @@ const API_BASE_URL = 'http://localhost:3000'; // API base URL
 export const extractPrices = (cards) => {
   return cards.map(card => {
     try {
-      const prices = JSON.parse(card.prices);
+      const prices = card.prices ? JSON.parse(card.prices) : {};
+      const usdPrice = prices.usd;
+      const usdFoilPrice = prices.usd_foil;
+
+      const quantity = card.quantity ? JSON.parse(card.quantity) : {};
+      const foilQuantity = quantity.foil;
+      const nonfoilQuantity = quantity.nonfoil;
+
       return {
         ...card,
-        usd: prices.usd,
-        usd_foil: prices.usd_foil
+        usdPrice,
+        usdFoilPrice,
+        foilQuantity,
+        nonfoilQuantity
       };
     } catch (error) {
-      console.error('Error parsing prices JSON:', error);
+      console.error('Error parsing prices or quantities JSON:', error);
       return {
         ...card,
         usd: null,
-        usd_foil: null
+        usd_foil: null,
+        foilQuantity: null,
+        nonfoilQuantity: null
       };
     }
   });
@@ -1565,14 +1558,32 @@ export const useCardContext = () => useContext(CardContext);
 import axios from 'axios';
 import { extractPrices } from '../utils/extractPrices';
 
-const API_BASE_URL = 'http://localhost:3000'; // INPUT_REQUIRED {API base URL}
+const API_BASE_URL = 'http://localhost:3000'; // API base URL
 
 export const fetchCardsByEdition = async (editionId) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/editions/${editionId}/cards`);
     console.log(`Fetched cards for edition ${editionId} successfully`);
-    const cardsWithPrices = extractPrices(response.data);
-    return cardsWithPrices;
+
+    const cardsWithDetails = response.data.map(card => {
+      const prices = JSON.parse(card.prices);
+      const usdPrice = prices.usd;
+      const usdFoilPrice = prices.usd_foil;
+
+      const quantity = JSON.parse(card.quantity);
+      const foilQuantity = quantity.foil;
+      const nonfoilQuantity = quantity.nonfoil;
+
+      return {
+        ...card,
+        usdPrice,
+        usdFoilPrice,
+        foilQuantity,
+        nonfoilQuantity
+      };
+    });
+
+    return cardsWithDetails;
   } catch (error) {
     console.error(`Error fetching cards for edition ${editionId}:`, error.message, error.stack);
     throw error;
@@ -1594,12 +1605,31 @@ export const fetchKioskCards = async () => {
   try {
     const response = await axios.get(`${API_BASE_URL}/kiosk`);
     console.log('Fetched cards for kiosk successfully');
-    const cardsWithPrices = extractPrices(response.data);
-    return cardsWithPrices;
+
+    const cardsWithDetails = response.data.map(card => {
+      const prices = JSON.parse(card.prices);
+      const usdPrice = prices.usd;
+      const usdFoilPrice = prices.usd_foil;
+
+      const quantity = JSON.parse(card.quantity);
+      const foilQuantity = quantity.foil;
+      const nonfoilQuantity = quantity.nonfoil;
+
+      return {
+        ...card,
+        usdPrice,
+        usdFoilPrice,
+        foilQuantity,
+        nonfoilQuantity
+      };
+    });
+
+    return cardsWithDetails;
   } catch (error) {
     console.error('Error fetching cards for kiosk:', error.message, error.stack);
     throw error;
   }
 };
+
 }}
 

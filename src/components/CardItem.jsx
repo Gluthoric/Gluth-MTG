@@ -3,34 +3,36 @@ import { Card as BootstrapCard, Form } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
 const CardItem = ({ card, handleUpdateQuantity }) => {
+  const { id, name, image_url, quantity_foil, quantity_nonfoil, price_foil, price_nonfoil } = card;
+
   return (
-    <BootstrapCard className={`card-item ${(card.quantity_foil + card.quantity_nonfoil) > 0 ? 'owned' : 'unowned'}`}>
+    <BootstrapCard className={`card-item ${(quantity_foil + quantity_nonfoil) > 0 ? 'owned' : 'unowned'}`}>
       <BootstrapCard.Body>
-        <BootstrapCard.Title>{card.name}</BootstrapCard.Title>
-        <img src={`/media/gluth/4tb1/MTG/card_images/${card.id}.jpg`} alt={card.name} style={{ width: '100%' }} />
+        <BootstrapCard.Title>{name}</BootstrapCard.Title>
+        <img src={image_url} alt={name} style={{ width: '100%' }} />
         <Form>
-          <Form.Group controlId={`card-quantity-foil-${card.id}`}>
+          <Form.Group controlId={`card-quantity-foil-${id}`}>
             <Form.Label>Foil Quantity</Form.Label>
             <Form.Control
               type="number"
-              value={card.quantity_foil}
-              onChange={e => handleUpdateQuantity(card.id, 'foil', parseInt(e.target.value))}
+              value={quantity_foil}
+              onChange={e => handleUpdateQuantity(id, 'foil', parseInt(e.target.value))}
               min="0"
             />
           </Form.Group>
-          <Form.Group controlId={`card-quantity-nonfoil-${card.id}`}>
+          <Form.Group controlId={`card-quantity-nonfoil-${id}`}>
             <Form.Label>Non-Foil Quantity</Form.Label>
             <Form.Control
               type="number"
-              value={card.quantity_nonfoil}
-              onChange={e => handleUpdateQuantity(card.id, 'nonfoil', parseInt(e.target.value))}
+              value={quantity_nonfoil}
+              onChange={e => handleUpdateQuantity(id, 'nonfoil', parseInt(e.target.value))}
               min="0"
             />
           </Form.Group>
         </Form>
         <div className="card-prices">
-          <p>Foil Price: ${card.price_foil}</p>
-          <p>Non-Foil Price: ${card.price_nonfoil}</p>
+          <p>Foil Price: ${price_foil}</p>
+          <p>Non-Foil Price: ${price_nonfoil}</p>
         </div>
       </BootstrapCard.Body>
     </BootstrapCard>

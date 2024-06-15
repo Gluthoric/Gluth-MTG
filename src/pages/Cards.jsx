@@ -31,7 +31,12 @@ const Cards = () => {
 
   const handleUpdateQuantity = async (cardId, type, newQuantity) => {
     try {
-      const updatedCard = await updateCardQuantity(cardId, newQuantity);
+      const card = cards.find(card => card.id === cardId);
+      const updatedQuantity = {
+        ...JSON.parse(card.quantity),
+        [type]: newQuantity
+      };
+      const updatedCard = await updateCardQuantity(cardId, JSON.stringify(updatedQuantity));
       dispatch({ type: 'UPDATE_CARD_QUANTITY', payload: { id: cardId, [type === 'foil' ? 'quantity_foil' : 'quantity_nonfoil']: newQuantity } });
       console.log(`Updated ${type} quantity for card ${cardId} to ${newQuantity}`);
     } catch (err) {
