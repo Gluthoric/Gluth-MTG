@@ -41,7 +41,6 @@ const Cards = () => {
 
   const handleSortChange = (option) => {
     dispatch({ type: 'SET_SORT_OPTION', payload: option });
-    // Implement sorting logic based on the selected option
     const sortedCards = [...cards].sort((a, b) => {
       if (option === 'name') {
         return a.name.localeCompare(b.name);
@@ -55,7 +54,6 @@ const Cards = () => {
 
   const handleFilterChange = (option) => {
     dispatch({ type: 'SET_FILTER_OPTION', payload: option });
-    // Implement filtering logic based on the selected option
     const filteredCards = cards.filter(card => {
       if (option === 'owned') {
         return (card.quantity_foil + card.quantity_nonfoil) > 0;

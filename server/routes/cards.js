@@ -14,9 +14,9 @@ router.get('/editions/:id/cards', async (req, res) => {
     const cards = await Card.findAll({
       where: { edition_id: id },
       attributes: [
-        'id', 'name', 'quantity', 'image_url', 'oracle_text', 'type_line',
+        'id', 'name', 'prices', 'quantity', 'image_url', 'oracle_text', 'type_line',
         'mana_cost', 'cmc', 'power', 'toughness', 'rarity', 'colors',
-        'color_identity', 'set_code', 'released_at', 'quantity_foil', 'quantity_nonfoil', 'price_foil', 'price_nonfoil', 'prices'
+        'color_identity', 'set_code', 'released_at'
       ]
     });
     if (cards.length > 0) {
@@ -65,9 +65,9 @@ router.get('/kiosk', async (req, res) => {
         ]
       },
       attributes: [
-        'id', 'name', 'quantity', 'image_url', 'oracle_text', 'type_line',
+        'id', 'name', 'prices', 'quantity', 'image_url', 'oracle_text', 'type_line',
         'mana_cost', 'cmc', 'power', 'toughness', 'rarity', 'colors',
-        'color_identity', 'set_code', 'released_at', 'quantity_foil', 'quantity_nonfoil', 'price_foil', 'price_nonfoil', 'prices'
+        'color_identity', 'set_code', 'released_at'
       ]
     });
     if (cards.length > 0) {

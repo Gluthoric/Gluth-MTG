@@ -6,17 +6,28 @@ export const extractPrices = (cards) => {
   return cards.map(card => {
     try {
       const prices = JSON.parse(card.prices);
+      const usdPrice = prices.usd;
+      const usdFoilPrice = prices.usd_foil;
+
+      const quantity = card.quantity;
+      const foilQuantity = quantity.foil;
+      const nonfoilQuantity = quantity.nonfoil;
+
       return {
         ...card,
-        usd: prices.usd,
-        usd_foil: prices.usd_foil
+        usdPrice,
+        usdFoilPrice,
+        foilQuantity,
+        nonfoilQuantity
       };
     } catch (error) {
       console.error('Error parsing prices JSON:', error);
       return {
         ...card,
         usd: null,
-        usd_foil: null
+        usd_foil: null,
+        foilQuantity: null,
+        nonfoilQuantity: null
       };
     }
   });
