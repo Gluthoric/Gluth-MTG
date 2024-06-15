@@ -1,38 +1,43 @@
-import React, { useEffect, useState } from 'react';
+// src/pages/Kiosk.jsx
+
+import React, { useEffect } from 'react';
 import axios from 'axios';
 import { Card as BootstrapCard, Form, Container, Row, Col } from 'react-bootstrap';
 import SortingFilteringControls from '../components/SortingFilteringControls';
 import { useCardContext } from '../context/CardContext';
+import CardItem from '../components/CardItem';
 
 const Kiosk = () => {
   const { state, dispatch } = useCardContext();
-  const { cards, sortOption, filterOption } = state;
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { cards, sortOption, filterOption, loading, error } = state;
 
   useEffect(() => {
     const fetchCards = async () => {
+      dispatch({ type: 'SET_LOADING', payload: true });
       try {
+        console.log('Fetching cards for kiosk');
         const response = await axios.get('http://localhost:3000/kiosk');
         let fetchedCards = response.data;
 
         dispatch({ type: 'SET_CARDS', payload: fetchedCards });
-        setLoading(false);
+        console.log('Fetched cards successfully:', fetchedCards);
       } catch (err) {
-        setError(err);
-        setLoading(false);
+        dispatch({ type: 'SET_ERROR', payload: err });
         console.error('Error fetching cards:', err.message, err.stack);
+      } finally {
+        dispatch({ type: 'SET_LOADING', payload: false });
       }
     };
 
     fetchCards();
   }, [dispatch]);
 
-  const handleUpdateQuantity = async (cardId, newQuantity) => {
+  const handleUpdateQuantity = async (cardId, type, newQuantity) => {
     try {
-      const updatedCard = await axios.patch(`http://localhost:3000/cards/${cardId}`, { quantity: newQuantity });
-      dispatch({ type: 'UPDATE_CARD_QUANTITY', payload: { id: cardId, quantity: newQuantity } });
-      console.log(`Updated quantity for card ${cardId} to ${newQuantity}`);
+      console.log(`Updating quantity for card ${cardId} to ${newQuantity}`);
+      await axios.patch(`http://localhost:3000/cards/${cardId}`, { quantity: newQuantity });
+      dispatch({ type: 'UPDATE_CARD_QUANTITY', payload: { id: cardId, [type === 'foil' ? 'quantity_foil' : 'quantity_nonfoil']: newQuantity } });
+      console.log(`Updated ${type} quantity for card ${cardId} to ${newQuantity}`);
     } catch (err) {
       console.error('Error updating quantity:', err.message, err.stack);
     }
@@ -40,12 +45,11 @@ const Kiosk = () => {
 
   const handleSortChange = (option) => {
     dispatch({ type: 'SET_SORT_OPTION', payload: option });
-    // Implement sorting logic based on the selected option
     const sortedCards = [...cards].sort((a, b) => {
       if (option === 'name') {
         return a.name.localeCompare(b.name);
       } else if (option === 'quantity') {
-        return b.quantity - a.quantity;
+        return (b.quantity_foil + b.quantity_nonfoil) - (a.quantity_foil + a.quantity_nonfoil);
       }
       return 0;
     });
@@ -54,12 +58,11 @@ const Kiosk = () => {
 
   const handleFilterChange = (option) => {
     dispatch({ type: 'SET_FILTER_OPTION', payload: option });
-    // Implement filtering logic based on the selected option
     const filteredCards = cards.filter(card => {
       if (option === 'owned') {
-        return card.quantity > 0;
+        return (card.quantity_foil + card.quantity_nonfoil) > 0;
       } else if (option === 'unowned') {
-        return card.quantity === 0;
+        return (card.quantity_foil + card.quantity_nonfoil) === 0;
       }
       return true;
     });
@@ -85,23 +88,8 @@ const Kiosk = () => {
       />
       <Row className="card-grid">
         {cards.map(card => (
-          <Col key={card.id} xs={12} sm={6} md={4} className={`card-item ${card.quantity > 0 ? 'owned' : 'unowned'}`}>
-            <BootstrapCard>
-              <BootstrapCard.Body>
-                <BootstrapCard.Title>{card.name}</BootstrapCard.Title>
-                <Form>
-                  <Form.Group controlId={`card-quantity-${card.id}`}>
-                    <Form.Label>Quantity</Form.Label>
-                    <Form.Control
-                      type="number"
-                      value={card.quantity}
-                      onChange={e => handleUpdateQuantity(card.id, parseInt(e.target.value))}
-                      min="0"
-                    />
-                  </Form.Group>
-                </Form>
-              </BootstrapCard.Body>
-            </BootstrapCard>
+          <Col key={card.id} xs={12} sm={6} md={4} className={`card-item ${(card.quantity_foil + card.quantity_nonfoil) > 0 ? 'owned' : 'unowned'}`}>
+            <CardItem card={card} handleUpdateQuantity={handleUpdateQuantity} />
           </Col>
         ))}
       </Row>

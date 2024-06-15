@@ -1,5 +1,9 @@
 import React from 'react';
 import { Container } from 'react-bootstrap';
+import logToFile from '../utils/logger.js';
+
+logToFile('Home.jsx: Rendering started');
+console.log('Home.jsx: Rendering started');
 
 const Home = () => {
   return (
@@ -9,5 +13,8 @@ const Home = () => {
     </Container>
   );
 };
+
+logToFile('Home.jsx: Rendering completed');
+console.log('Home.jsx: Rendering completed');
 
 export default Home;

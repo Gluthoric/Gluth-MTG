@@ -1,6 +1,6 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
+  width: 100%;
+  height: 100%;
   padding: 2rem;
   text-align: center;
 }
@@ -31,4 +31,20 @@
 
 .card-item.unowned {
   background-color: #f8d7da;
+}
+
+.edition-card {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.edition-card img {
+  max-width: 100%;
+  height: auto;
+}
+
+.edition-card .card-title {
+  margin-top: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: bold;
 }

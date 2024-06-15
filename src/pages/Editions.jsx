@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
-import { ListGroup, Container } from 'react-bootstrap';
+import { Container, Alert, Row, Col } from 'react-bootstrap';
 import { useCardContext } from '../context/CardContext';
+import EditionCard from '../components/EditionCard';
 
 const Editions = () => {
   const { state, dispatch } = useCardContext();
@@ -33,20 +33,24 @@ const Editions = () => {
   }
 
   if (error) {
-    return <div>Error: {error.message}</div>;
+    return <Alert variant="danger">Error: {error.message}</Alert>;
   }
 
   return (
     <Container>
       <h2>Editions Page</h2>
       <p>Here you can see all the editions.</p>
-      <ListGroup>
+      <Row>
         {editions.map((edition) => (
-          <ListGroup.Item key={edition.id}>
-            <Link to={`/editions/${edition.id}`}>{edition.name}</Link>
-          </ListGroup.Item>
+          <Col key={edition.id} xs={12} sm={6} md={4} lg={3}>
+            <EditionCard
+              id={edition.id}
+              name={edition.name}
+              iconSvgUri={edition.icon_svg_uri}
+            />
+          </Col>
         ))}
-      </ListGroup>
+      </Row>
     </Container>
   );
 };

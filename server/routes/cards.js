@@ -1,3 +1,5 @@
+// server/routes/cards.js
+
 import express from 'express';
 import Sequelize from 'sequelize'; // Import Sequelize for operators
 import Card from '../models/card.js';
@@ -9,7 +11,14 @@ const router = express.Router();
 router.get('/editions/:id/cards', async (req, res) => {
   const { id } = req.params;
   try {
-    const cards = await Card.findAll({ where: { edition_id: id } });
+    const cards = await Card.findAll({
+      where: { edition_id: id },
+      attributes: [
+        'id', 'name', 'quantity', 'image_url', 'oracle_text', 'type_line',
+        'mana_cost', 'cmc', 'power', 'toughness', 'rarity', 'colors',
+        'color_identity', 'set_code', 'released_at', 'quantity_foil', 'quantity_nonfoil', 'price_foil', 'price_nonfoil', 'prices'
+      ]
+    });
     if (cards.length > 0) {
       console.log(`Fetched cards for edition ${id} successfully:`, cards); // Log fetched cards
     } else {
@@ -50,13 +59,22 @@ router.get('/kiosk', async (req, res) => {
   try {
     const cards = await Card.findAll({
       where: {
-        // Assuming 'quantity->quantity_foil' or 'quantity->quantity_nonfoil' is the correct JSON path
-        'quantity->quantity_foil': {
-          [Sequelize.Op.gt]: 1
-        }
-      }
+        [Sequelize.Op.or]: [
+          { quantity_foil: { [Sequelize.Op.gt]: 1 } },
+          { quantity_nonfoil: { [Sequelize.Op.gt]: 1 } }
+        ]
+      },
+      attributes: [
+        'id', 'name', 'quantity', 'image_url', 'oracle_text', 'type_line',
+        'mana_cost', 'cmc', 'power', 'toughness', 'rarity', 'colors',
+        'color_identity', 'set_code', 'released_at', 'quantity_foil', 'quantity_nonfoil', 'price_foil', 'price_nonfoil', 'prices'
+      ]
     });
-    console.log('Fetched cards for kiosk successfully:', cards); // Log fetched cards
+    if (cards.length > 0) {
+      console.log('Fetched cards for kiosk successfully:', cards); // Log fetched cards
+    } else {
+      console.log('No cards found for kiosk');
+    }
     res.status(200).json(cards);
   } catch (error) {
     console.error('Error fetching cards for kiosk:', error.message, error.stack);

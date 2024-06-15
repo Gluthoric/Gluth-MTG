@@ -6,7 +6,9 @@ const router = express.Router();
 // GET /editions - Fetch all editions
 router.get('/', async (req, res) => {
   try {
-    const editions = await Edition.findAll();
+    const editions = await Edition.findAll({
+      attributes: ['id', 'name', 'icon_svg_uri'] // Include icon_svg_uri in the response
+    });
     if (editions.length > 0) {
       console.log('Fetched all editions successfully:', editions); // Log fetched editions
     } else {
