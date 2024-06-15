@@ -1,0 +1,16 @@
+[0] Executing (default): SELECT `id`, `name`, JSON_UNQUOTE(json_unquote(json_extract(`prices`,'$'))) AS `prices`, JSON_UNQUOTE(json_unquote(json_extract(`quantity`,'$'))) AS `quantity`, `image_url`, `oracle_text`, `type_line`, `mana_cost`, `cmc`, `power`, `toughness`, `rarity`, `colors`, `color_identity`, `set_code`, `released_at` FROM `cards` AS `Card` WHERE `Card`.`edition_id` = '005f56a5-9661-4bd1-bf05-cf133ccdcdcf';
+[0] Executing (default): SELECT `id`, `name`, JSON_UNQUOTE(json_unquote(json_extract(`prices`,'$'))) AS `prices`, JSON_UNQUOTE(json_unquote(json_extract(`quantity`,'$'))) AS `quantity`, `image_url`, `oracle_text`, `type_line`, `mana_cost`, `cmc`, `power`, `toughness`, `rarity`, `colors`, `color_identity`, `set_code`, `released_at` FROM `cards` AS `Card` WHERE `Card`.`edition_id` = '005f56a5-9661-4bd1-bf05-cf133ccdcdcf';
+[0] Error fetching cards for edition 005f56a5-9661-4bd1-bf05-cf133ccdcdcf: Unknown column 'prices' in 'field list' Error
+[0]     at Query.run (/home/gluth/back-gpt-pilot/workspace/react-gluth-mtg/node_modules/sequelize/lib/dialects/mysql/query.js:52:25)
+[0]     at /home/gluth/back-gpt-pilot/workspace/react-gluth-mtg/node_modules/sequelize/lib/sequelize.js:315:28
+[0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[0]     at async MySQLQueryInterface.select (/home/gluth/back-gpt-pilot/workspace/react-gluth-mtg/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+[0]     at async Card.findAll (/home/gluth/back-gpt-pilot/workspace/react-gluth-mtg/node_modules/sequelize/lib/model.js:1140:21)
+[0]     at async file:///home/gluth/back-gpt-pilot/workspace/react-gluth-mtg/server/routes/cards.js:13:19
+[0] Error fetching cards for edition 005f56a5-9661-4bd1-bf05-cf133ccdcdcf: Unknown column 'prices' in 'field list' Error
+[0]     at Query.run (/home/gluth/back-gpt-pilot/workspace/react-gluth-mtg/node_modules/sequelize/lib/dialects/mysql/query.js:52:25)
+[0]     at /home/gluth/back-gpt-pilot/workspace/react-gluth-mtg/node_modules/sequelize/lib/sequelize.js:315:28
+[0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[0]     at async MySQLQueryInterface.select (/home/gluth/back-gpt-pilot/workspace/react-gluth-mtg/node_modules/sequelize/lib/dialects/abstract/query-interface.js:407:12)
+[0]     at async Card.findAll (/home/gluth/back-gpt-pilot/workspace/react-gluth-mtg/node_modules/sequelize/lib/model.js:1140:21)
+[0]     at async file:///home/gluth/back-gpt-pilot/workspace/react-gluth-mtg/server/routes/cards.js:13:19

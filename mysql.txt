@@ -1,0 +1,48 @@
+mysql> DESCRIBE cards;
++------------------+---------------+------+-----+---------+-------+
+| Field            | Type          | Null | Key | Default | Extra |
++------------------+---------------+------+-----+---------+-------+
+| id               | varchar(50)   | NO   | PRI | NULL    |       |
+| name             | varchar(255)  | NO   |     | NULL    |       |
+| set_name         | varchar(255)  | NO   |     | NULL    |       |
+| collector_number | varchar(50)   | YES  |     | NULL    |       |
+| scryfall_id      | varchar(50)   | YES  | UNI | NULL    |       |
+| image_url        | varchar(255)  | YES  |     | NULL    |       |
+| oracle_text      | text          | YES  |     | NULL    |       |
+| type_line        | varchar(255)  | YES  |     | NULL    |       |
+| mana_cost        | varchar(50)   | YES  |     | NULL    |       |
+| cmc              | decimal(10,2) | YES  |     | NULL    |       |
+| power            | varchar(10)   | YES  |     | NULL    |       |
+| toughness        | varchar(10)   | YES  |     | NULL    |       |
+| rarity           | varchar(50)   | YES  |     | NULL    |       |
+| colors           | json          | YES  |     | NULL    |       |
+| color_identity   | json          | YES  |     | NULL    |       |
+| set_code         | varchar(36)   | YES  |     | NULL    |       |
+| released_at      | date          | YES  |     | NULL    |       |
+| edition_id       | varchar(36)   | YES  | MUL | NULL    |       |
+| price_nonfoil    | decimal(10,2) | YES  |     | NULL    |       |
+| price_foil       | decimal(10,2) | YES  |     | NULL    |       |
+| quantity_foil    | int           | YES  |     | 0       |       |
+| quantity_nonfoil | int           | YES  |     | 0       |       |
++------------------+---------------+------+-----+---------+-------+
+22 rows in set (0.00 sec)
+
+
+mysql> SELECT 
+    ->   id, 
+    ->   name, 
+    ->   price_nonfoil AS price_usd, 
+    ->   price_foil AS price_usd_foil, 
+    ->   quantity_foil, 
+    ->   quantity_nonfoil 
+    -> FROM cards 
+    -> LIMIT 1;
++--------------------------------------+-------------+-----------+----------------+---------------+------------------+
+| id                                   | name        | price_usd | price_usd_foil | quantity_foil | quantity_nonfoil |
++--------------------------------------+-------------+-----------+----------------+---------------+------------------+
+| 0000579f-7b35-4ed3-b44c-db2a538066fe | Fury Sliver |      0.41 |           1.80 |             0 |                0 |
++--------------------------------------+-------------+-----------+----------------+---------------+------------------+
+1 row in set (0.00 sec)
+
+mysql> 
+

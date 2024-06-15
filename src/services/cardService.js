@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { extractPrices } from '../utils/extractPrices';
 
 const API_BASE_URL = 'http://localhost:3000'; // API base URL
 
@@ -9,20 +8,12 @@ export const fetchCardsByEdition = async (editionId) => {
     console.log(`Fetched cards for edition ${editionId} successfully`);
 
     const cardsWithDetails = response.data.map(card => {
-      const prices = JSON.parse(card.prices);
-      const usdPrice = prices.usd;
-      const usdFoilPrice = prices.usd_foil;
-
-      const quantity = JSON.parse(card.quantity);
-      const foilQuantity = quantity.foil;
-      const nonfoilQuantity = quantity.nonfoil;
-
       return {
         ...card,
-        usdPrice,
-        usdFoilPrice,
-        foilQuantity,
-        nonfoilQuantity
+        usdPrice: card.price_nonfoil,
+        usdFoilPrice: card.price_foil,
+        foilQuantity: card.quantity_foil,
+        nonfoilQuantity: card.quantity_nonfoil
       };
     });
 
@@ -33,10 +24,10 @@ export const fetchCardsByEdition = async (editionId) => {
   }
 };
 
-export const updateCardQuantity = async (cardId, quantity) => {
+export const updateCardQuantity = async (cardId, quantity_foil, quantity_nonfoil) => {
   try {
-    const response = await axios.patch(`${API_BASE_URL}/cards/${cardId}`, { quantity });
-    console.log(`Updated quantity for card ${cardId} to ${quantity}`);
+    const response = await axios.patch(`${API_BASE_URL}/cards/${cardId}`, { quantity_foil, quantity_nonfoil });
+    console.log(`Updated quantity for card ${cardId} to foil: ${quantity_foil}, nonfoil: ${quantity_nonfoil}`);
     return response.data;
   } catch (error) {
     console.error(`Error updating quantity for card ${cardId}:`, error.message, error.stack);
@@ -50,20 +41,12 @@ export const fetchKioskCards = async () => {
     console.log('Fetched cards for kiosk successfully');
 
     const cardsWithDetails = response.data.map(card => {
-      const prices = JSON.parse(card.prices);
-      const usdPrice = prices.usd;
-      const usdFoilPrice = prices.usd_foil;
-
-      const quantity = JSON.parse(card.quantity);
-      const foilQuantity = quantity.foil;
-      const nonfoilQuantity = quantity.nonfoil;
-
       return {
         ...card,
-        usdPrice,
-        usdFoilPrice,
-        foilQuantity,
-        nonfoilQuantity
+        usdPrice: card.price_nonfoil,
+        usdFoilPrice: card.price_foil,
+        foilQuantity: card.quantity_foil,
+        nonfoilQuantity: card.quantity_nonfoil
       };
     });
 

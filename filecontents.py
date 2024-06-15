@@ -4,7 +4,7 @@ import os
 directories = ['server', 'src']
 
 # Define the output file
-output_file = 'code.md'
+output_file = 'code.txt'
 
 def find_files_with_extension(root_dir):
     files_with_extension = []

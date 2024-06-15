@@ -1,9 +1,12 @@
-import { DataTypes } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import sequelize from '../config/database.js';
 
-const Card = sequelize.define('Card', {
+class Card extends Model {}
+
+Card.init({
   id: {
     type: DataTypes.STRING(50),
+    allowNull: false,
     primaryKey: true,
   },
   name: {
@@ -106,6 +109,8 @@ const Card = sequelize.define('Card', {
     allowNull: true,
   },
 }, {
+  sequelize,
+  modelName: 'Card',
   tableName: 'cards',
   timestamps: false,
 });
