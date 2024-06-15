@@ -1,7 +1,0 @@
-
-  VITE v5.2.13  ready in 136 ms
-
-  ➜  Local:   http://localhost:5173/
-  ➜  Network: use --host to expose
-  ➜  press h + enter to show help
-7:59:20 PM [vite] hmr update /src/pages/Cards.jsx
